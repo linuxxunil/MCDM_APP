@@ -1,6 +1,7 @@
-package edu.mcdm.model;
+package edu.mcdm.database;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -20,14 +21,15 @@ public class MSSqlDriver extends DatabaseDriver {
 	public int onConnect() {
 		try {
 			Class.forName("net.sourceforge.jtds.jdbc.Driver");
+			
 			con = DriverManager
 					.getConnection(
 							"jdbc:jtds:sqlserver://175.99.86.134:1433;instance=Cscheduling_SQL;DatabaseName=cscheduling;charset=utf-8",
 							UserName, Password);
 		} catch (ClassNotFoundException e1) {
-			return StatusCode.ERR_JTDS_ERROR();
+			return StatusCode.ERR_JDBC_CLASS_NOT_FOUND();
 		} catch (SQLException e) {
-			return StatusCode.ERR_MSSQL_CONNECT_ERROR();
+			return StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(e.getMessage());
 		}
 		return StatusCode.success;
 	}
@@ -37,7 +39,7 @@ public class MSSqlDriver extends DatabaseDriver {
 		if (con == null)
 			return StatusCode.ERR_INITIAL_DB_NOT_SUCCESS();
 		else if (sql.isEmpty())
-			return StatusCode.ERR_SQL_SYNTAX_IS_NULL();
+			return StatusCode.ERR_PARM_SQL_SYNTAX_IS_NULL();
 
 		try {
 			stmt = con.createStatement();
@@ -45,24 +47,18 @@ public class MSSqlDriver extends DatabaseDriver {
 			rs.close();
 			stmt.close();
 		} catch (SQLException e) {
-			StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(sql);
+			return StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(e.getMessage());
 		}
 		return StatusCode.success;
 	}
 
-	@Override
-	public int inset(String tblName, String colsName, String colsValue) {
-		String sql = String.format("INSERT INTO '%s' (%s) VALUES (%s)",
-				tblName, colsName, colsValue);
-		return inset(sql);
-	}
 
 	@Override
 	public int createTable(String sql) {
 		if (con == null)
 			return StatusCode.ERR_INITIAL_DB_NOT_SUCCESS();
 		else if (sql.isEmpty())
-			return StatusCode.ERR_SQL_SYNTAX_IS_NULL();
+			return StatusCode.ERR_PARM_SQL_SYNTAX_IS_NULL();
 
 		try {
 			stmt = con.createStatement();
@@ -70,37 +66,19 @@ public class MSSqlDriver extends DatabaseDriver {
 			rs.close();
 			stmt.close();
 		} catch (SQLException e) {
-			StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(sql);
+			return StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(e.getMessage());
 		}
 		return StatusCode.success;
 	}
 
-	@Override
-	public void beginTransaction() {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
-	public void endTransaction() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setTransactionSuccessful() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	@Override
-	public ResultSet selectMS(String sql) {
+	public ResultSet select(String sql) {
 		if (con == null) {
-			//StatusCode.ERR_INITIAL_DB_NOT_SUCCESS();
+			StatusCode.ERR_INITIAL_DB_NOT_SUCCESS();
 			return null;
 		} else if (sql.isEmpty()) {
-			//StatusCode.ERR_SQL_SYNTAX_IS_NULL();
+			StatusCode.ERR_PARM_SQL_SYNTAX_IS_NULL();
 			return null;
 		}
 
@@ -108,33 +86,10 @@ public class MSSqlDriver extends DatabaseDriver {
 			stmt = con.createStatement();
 			rs = stmt.executeQuery(sql);
 		} catch (SQLException e) {
-			StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(sql);
+			StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(e.getMessage());
+			return null;
 		}
 		return rs;
-
-	}
-	*/
-
-	//@Override
-	//public ResultCursor selectMS(String tblName, String cols, String whereExpr) {
-	//	String sql = String.format("SELECT %s FROM %s", cols, tblName);
-
-	//	if (whereExpr != null) {
-	//		sql += " WHERE " + whereExpr;
-	//	}
-	//	return selectMS(sql);
-	//}
-
-	@Override
-	public ResultCursor select(String sql) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResultCursor select(String tblName, String cols, String whereExpr) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -142,7 +97,7 @@ public class MSSqlDriver extends DatabaseDriver {
 		if (con == null)
 			return StatusCode.ERR_INITIAL_DB_NOT_SUCCESS();
 		else if (sql.isEmpty())
-			return StatusCode.ERR_SQL_SYNTAX_IS_NULL();
+			return StatusCode.ERR_PARM_SQL_SYNTAX_IS_NULL();
 
 		try {
 			stmt = con.createStatement();
@@ -150,7 +105,7 @@ public class MSSqlDriver extends DatabaseDriver {
 			rs.close();
 			stmt.close();
 		} catch (SQLException e) {
-			StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(sql);
+			return StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(e.getMessage());
 		}
 		return StatusCode.success;
 	}
@@ -160,7 +115,7 @@ public class MSSqlDriver extends DatabaseDriver {
 		if (con == null)
 			return StatusCode.ERR_INITIAL_DB_NOT_SUCCESS();
 		else if (sql.isEmpty())
-			return StatusCode.ERR_SQL_SYNTAX_IS_NULL();
+			return StatusCode.ERR_PARM_SQL_SYNTAX_IS_NULL();
 
 		try {
 			stmt = con.createStatement();
@@ -168,15 +123,89 @@ public class MSSqlDriver extends DatabaseDriver {
 			rs.close();
 			stmt.close();
 		} catch (SQLException e) {
-			StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(sql);
+			return StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(e.getMessage());
 		}
 		return StatusCode.success;
 	}
 
 	@Override
-	public int update(String table, String repValues, String whereExpr) {
-		String sql = String.format("UPDATE '%s' SET %s WHERE %s", table, repValues, whereExpr);
-		return update(sql);
+	public void setAutoCommit(boolean value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void commit() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void rollback() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean getAutoCommit() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void close() {
+		if(stmt != null) {
+			try {
+				stmt.close();
+			} catch(SQLException e) {
+				StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(e.getMessage());
+			}
+		}
+		
+		if(con != null) {
+			try {
+				con.close();
+			} catch(SQLException e) {
+				StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(e.getMessage());     
+			}
+		}
+		
+	}
+
+	@Override
+	public String[] getTables() {
+		String[] tables = null;
+		try {
+			DatabaseMetaData  meta = con.getMetaData();
+			
+			ResultSet rs = meta.getTables(null, null, "%", null);
+			
+			int len=0;
+			while ( rs.next() ) { 
+				if ( rs.getString("TABLE_NAME").equals("CHECK_CONSTRAINTS") )
+					break;
+				len++;
+			}
+			
+			if ( len <= 0 ) {
+				rs.close();
+				return null;
+			}
+			
+			tables = new String[len];
+			rs = meta.getTables(null, null, "%", null);
+			
+			int i = 0;
+			while ( i<len && rs.next() ) {
+				tables[i++] = new String(rs.getString("TABLE_NAME"));
+			}
+			
+			rs.close();
+		} catch (SQLException e) {
+			StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(e.getMessage());
+			return null;
+		}
+		return tables;
 	}
 
 }
