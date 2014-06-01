@@ -5,9 +5,9 @@ import java.util.regex.Pattern;
 
 public class StringUtility {
 	/**
-	 * ¨ç¼Æ¦WºÙ : getDirectory
-	 * ¨ç¼Æ»¡©ú : Â^¨úÀÉ®×ªº¸ô®|¦ì¸m
-	 * ¨ç¼Æ½d¨Ò :  
+	 * å‡½æ•¸åç¨± : getDirectory
+	 * å‡½æ•¸èªªæ˜ : æ“·å–æª”æ¡ˆçš„è·¯å¾‘ä½ç½®
+	 * å‡½æ•¸ç¯„ä¾‹ :  
 	 * @param token
 	 * @param path
 	 * @return
@@ -18,9 +18,9 @@ public class StringUtility {
 	}
 	
 	/**
-	 * ¨ç¼Æ¦WºÙ : getDirectory
-	 * ¨ç¼Æ»¡©ú : Â^¨úÀÉ®×ªº¸ô®|¦ì¸m
-	 * ¨ç¼Æ½d¨Ò :  
+	 * å‡½æ•¸åç¨± : getDirectory
+	 * å‡½æ•¸èªªæ˜ : æ“·å–æª”æ¡ˆçš„è·¯å¾‘ä½ç½®
+	 * å‡½æ•¸ç¯„ä¾‹ :  
 	 *  input  : /sdcard/data/cscheduling/data.db
 	 *  output : /sdcard/data/cscheduling
 	 * 
@@ -38,9 +38,9 @@ public class StringUtility {
 	
 	
 	/**
-	 * ¨ç¼Æ¦WºÙ : isMailAddress
-	 * ¨ç¼Æ»¡©ú : §PÂ_¬O§_¬OMailAdress
-	 * ¨ç¼Æ½d¨Ò :  
+	 * å‡½æ•¸åç¨± : isMailAddress
+	 * å‡½æ•¸èªªæ˜ : åˆ¤æ–·æ˜¯å¦æ˜¯MailAdress
+	 * å‡½æ•¸ç¯„ä¾‹ :  
 	 *  input  : jesse_lin@ismp.csie.ncku.edu.tw
 	 *  output : true
 	 * @param mail

@@ -2,14 +2,14 @@ package edu.mcdm.common;
 
 /**
  * StatusCode Definition 
- *  Status Code ¬O±q 00000000~99999999 and -00000001~-99999999
- *  ªº¤@²Õ¼Æ­È¡A0:ªí¥Ü¦¨¥\ / ¥¿: Information / ­t: Error 
+ *  Status Code æ˜¯å¾ 00000000~99999999 and -00000001~-99999999
+ *  çš„ä¸€çµ„æ•¸å€¼ï¼Œ0:è¡¨ç¤ºæˆåŠŸ / æ­£: Information / è² : Error 
  *  
- *  ²Ä 1 digital(MSB) = Log Type ( Developer Log (0) / User Log(1) )
- *  ²Ä 2 digital(MSB) = Package Number
- *  ²Ä 3~4 digital(MSB) = Class Number
- *  ²Ä 5~6 digital(MSB) = Function Number
- *  ²Ä 7~8 digital(MSB) = Status Code
+ *  ç¬¬ 1 digital(MSB) = Log Type ( Developer Log (0) / User Log(1) )
+ *  ç¬¬ 2 digital(MSB) = Package Number
+ *  ç¬¬ 3~4 digital(MSB) = Class Number
+ *  ç¬¬ 5~6 digital(MSB) = Function Number
+ *  ç¬¬ 7~8 digital(MSB) = Status Code
  *  
  *  0x0 0 0 00 00 00
  *  1 2  3  4  5
@@ -18,6 +18,7 @@ package edu.mcdm.common;
  * @author jesse
  *
  */
+
 
 public class StatusCode {
 	public static final int success = 0;
