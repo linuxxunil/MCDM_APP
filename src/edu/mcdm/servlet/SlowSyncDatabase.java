@@ -33,12 +33,24 @@ public class SlowSyncDatabase extends HttpServlet{
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 										throws ServletException, IOException {
 		
-		DatabaseSynchronize sync = new DatabaseSynchronize();
+		String syncRules =  "[" 
+				+ "{\"Var[0]\":\"a@a.com\",\"Var[1]\":\"hospitsssalNo\"},"
+				+ "{\"TblName\":\"users\",\"TblSql\":\"SELECT t1.* FROM users t1 WHERE userid=\'$Var[0]\'\"},"
+				+ "{\"TblName\":\"Hospital\",\"TblSql\":\"SELECT t2.* FROM users t1,Hospital t2 WHERE userid=\'$Var[0]\' AND t1.HospitalNo=t2.HospitalNo\"}," 
+				+ "{\"TblName\":\"DorSchedule\",\"TblSql\":\"SELECT t2.* FROM users t1,DorSchedule t2 WHERE userid=\'$Var[0]\' AND t1.HospitalNo=t2.HospitalNo\"}," 
+				+ "{\"TblName\":\"Department\",\"TblSql\":\"SELECT t2.* FROM users t1,Department t2 WHERE userid=\'$Var[0]\' AND t1.HospitalNo=t2.HospitalNo\"}," 
+				+ "{\"TblName\":\"Doctor\",\"TblSql\":\"SELECT t2.* FROM users t1,Doctor t2 WHERE userid=\'$Var[0]\' AND t1.HospitalNo=t2.HospitalNo\"},"
+				+ "{\"TblName\":\"CodeFile\",\"TblSql\":\"SELECT t2.* FROM users t1,CodeFile t2 WHERE userid=\'$Var[0]\' AND t1.HospitalNo=t2.HospitalNo\"}" 
+				+ "]";
 		
-		sync.wget(new URL("http://csmp.servehttp.com/index.php"), "D:\\016_Workspace\\MCDM_APP\\index.html");
-		//sync.slowSynchronize(null, "AAAA", "AAA");
+		String syncDbId = "7a6c0e29-0a24-4f48-878b-799f03f55105";
+		String smeId= "a@a.com";
 
+		String result =  new DatabaseSynchronize().slowSynchronize(null,syncRules, syncDbId, smeId);
 		
+		PrintWriter out = resp.getWriter();
+		out.println(result);
+        out.close();
 	}
 	
 	@Override

@@ -12,6 +12,7 @@ import java.net.URLConnection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,22 +22,24 @@ import org.json.JSONTokener;
 import edu.mcdm.common.StatusCode;
 import edu.mcdm.security.Encrypt;
 
-
-/*
-Example Format
-"[" +
-"{\"VAR_LEN\":1,\"VAR[0]\":\"a@a.com\",}," +
-"{\"TblName\":\"users\",\"TblSql\":\"SELECT t1.* FROM users t1 WHERE userid=\'a@a.com\'\"}"+ 
-"{\"TblName\":\"Hospital\",\"TblSql\":\"SELECT t2.* FROM users t1,Hospital t2 WHERE userid=\'a@a.com\' AND t1.HospitalNo=t2.HospitalNo\"}"+ 
-"{\"TblName\":\"DorSchedule\",\"TblSql\":\"SELECT t2.* FROM users t1,DorSchedule t2 WHERE userid=\'a@a.com\' AND t1.HospitalNo=t2.HospitalNo\"}"+ 
-"{\"TblName\":\"Department\",\"TblSql\":\"SELECT t2.* FROM users t1,Department t2 WHERE userid=\'a@a.com\' AND t1.HospitalNo=t2.HospitalNo\"}"+ 
-"{\"TblName\":\"Doctor\",\"TblSql\":\"SELECT t2.* FROM users t1,Doctor t2 WHERE userid=\'a@a.com\' AND t1.HospitalNo=t2.HospitalNo\"}"+ 
-"{\"TblName\":\"CodeFile\",\"TblSql\":\"SELECT t2.* FROM users t1,CodeFile t2 WHERE userid=\'a@a.com\' AND t1.HospitalNo=t2.HospitalNo\"}"+ 
-"]"
-*/
 public class DatabaseSynchronize {
+	/*
+	String templatePath = System.getenv("template_path");
+	String tmpPath = System.getenv("tmp_path");
+	*/
+	private String dbDir = System.getenv("db_schmea_dir");
+	private String tmpDir =System.getenv("tmp_dir");
+	private String downloadDir = System.getenv("downalod_dir");
 	
-	private String getSampleRules() {
+	public DatabaseSynchronize() {
+		if ( System.getenv("use_cloudfoundry") == null ) {
+			dbDir = "D:\\016_Workspace\\MCDM_APP\\mcdm\\db\\";
+			tmpDir ="D:\\016_Workspace\\MCDM_APP\\mcdm\\tmp\\";
+			downloadDir = "D:\\016_Workspace\\MCDM_APP\\mcdm\\download\\";
+		}
+	}
+	
+	private String getSampleRules() { //for test
 		return "[" 
 				+ "{\"Var[0]\":\"a@a.com\",\"Var[1]\":\"hospitsssalNo\"},"
 				+ "{\"TblName\":\"users\",\"TblSql\":\"SELECT t1.* FROM users t1 WHERE userid=\'$Var[0]\'\"},"
@@ -49,11 +52,14 @@ public class DatabaseSynchronize {
 	}
 		
 	public String getDatabasePath(String smeId, String appId) {
-		String templatePath = System.getenv("template_path");
-		String tmpPath = System.getenv("tmp_path");
+
 		String fileName = Encrypt.MD5(smeId+appId);
-		copyFile(templatePath+fileName,tmpPath+fileName);
-		return Encrypt.MD5(smeId+appId);
+		String randomFileName = UUID.randomUUID().toString(); 
+		int ret = copyFile(dbDir+fileName,tmpDir+randomFileName) ;
+		if ( ret == StatusCode.success ) 
+			return randomFileName;
+		else
+			return null;
 	}
 
 	public String getAllTableOfApp(String smeId, String appId) {
@@ -78,7 +84,7 @@ public class DatabaseSynchronize {
 			}
 			
 			DatabaseDriver db = 
-					new SqliteDriver(appDbPath);
+					new SqliteDriver(tmpDir+appDbPath);
 		
 			db.onConnect();
 		
@@ -110,6 +116,10 @@ public class DatabaseSynchronize {
 	public String  slowSynchronize(String srcDbPath, String syncRules, 
 											String syncDbId, String smeId) {
 		String[][] rules = null;
+		String syncDbPath = tmpDir + syncDbId;
+		String downloadDbPath = downloadDir + syncDbId;
+		File f = new File(syncDbPath);
+		
 		if ( srcDbPath != null ) {
 			StatusCode.ERR_PARM_SOURCE_DB_ISNOT_ERROR(); 
 			return "{\"STATUS:\"-105\",\"STATUS_DESCRIPTION\":\"Source DB Error\","
@@ -117,7 +127,7 @@ public class DatabaseSynchronize {
 		} else if ((rules=getTableSyncRules(syncRules)) == null ) {
 			return "{\"STATUS:\"-108\",\"STATUS_DESCRIPTION\":\"Sync Rules Error\","
 					  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH\":\"0\"}";
-		} else if ( syncDbId == null || syncDbId.isEmpty() ) {
+		} else if ( syncDbId == null || syncDbId.isEmpty() || !f.exists() || !f.isFile()) {
 			StatusCode.ERR_PARM_SYNC_DB_IS_NULL(); 
 			return "{\"STATUS:\"-106\",\"STATUS_DESCRIPTION\":\"Sync DB ID Error\","
 			  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH\":\"0\"}";
@@ -126,17 +136,23 @@ public class DatabaseSynchronize {
 			return "{\"STATUS:\"-103\",\"STATUS_DESCRIPTION\":\"SMEID Error\","
 			  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH\":\"0\"}";
 		}
-		
+
 		for ( int i=0 ; i<rules[0].length; i++ ) {
-			if ( execDataFromServerToSqlite(srcDbPath, rules[0][i], rules[1][i]) != 0 )
+			if ( execDataFromServerToSqlite(syncDbPath, rules[0][i], rules[1][i])
+															!= StatusCode.success ) {
+				deleteFile(syncDbPath);
 				return "{\"STATUS:\"-201\",\"STATUS_DESCRIPTION\":\"Synchronized Error\","
 				  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH\":\"0\"}";
+			}
 		}
-		
-		return null;
-	}	
-	
 
+		if ( moveFile(syncDbPath, downloadDbPath) != 0 )
+			return "{\"STATUS:\"-201\",\"STATUS_DESCRIPTION\":\"Synchronized Error\","
+			  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH\":\"0\"}";
+		
+		return "{\"STATUS:\"0\",\"STATUS_DESCRIPTION\":\"OK\","
+				  + "\"DB_DOWNLOAD_LINK\":\""+downloadDbPath+"\"}";
+	}	
 	
 	private String[][] getTableSyncRules(String jsonRules) {
 		String[][] rules = null;
@@ -182,6 +198,8 @@ public class DatabaseSynchronize {
 	private int execDataFromServerToSqlite(String dbPath, String table,String syncSql) {
 		DatabaseDriver ms = new MSSqlDriver();
 		DatabaseDriver sqlite = new SqliteDriver(dbPath);
+	
+		int ret = StatusCode.success;
 		ms.onConnect();
 		sqlite.onConnect();
 		
@@ -189,7 +207,7 @@ public class DatabaseSynchronize {
 			ResultSet rs = ms.select(syncSql);
 
 			if ( rs == null ) {
-				return StatusCode.ERR_EXE_USER_SQL_ERROR();
+				return StatusCode.ERR_EXE_USER_RULES_ERROR();
 			}
 			
 			ResultSetMetaData meta = rs.getMetaData();
@@ -214,17 +232,20 @@ public class DatabaseSynchronize {
 				values += ")";
 				
 				System.out.println(sql+values);
-				sqlite.inset(sql+values);
+				if ( sqlite.inset(sql+values) != StatusCode.success ) {
+					ret = StatusCode.ERR_EXE_USER_RULES_TO_DB_ERROR();
+					break;
+				}
 			}
 			
 		} catch (SQLException e) {
-			return StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(e.getMessage());
-		} 
-
-		ms.close();
-		sqlite.close();
+			ret = StatusCode.ERR_SQL_SYNTAX_IS_ILLEGAL(e.getMessage());
+		} finally {
+			ms.close();
+			sqlite.close();
+		}
 		
-		return StatusCode.success;
+		return ret;
 	}
 	
 	private int copyFile(String src, String dst) {
@@ -252,7 +273,7 @@ public class DatabaseSynchronize {
 			try {
 				im.close();
 				om.close();
-			} catch ( IOException e1 ) {
+			} catch ( Exception e1 ) {
 				// noting
 			}
 		}
@@ -260,9 +281,8 @@ public class DatabaseSynchronize {
 	}
 	
 	private int deleteFile(String path ){
-		String fileName = "file.txt";
 		// A File object to represent the filename
-		File f = new File(fileName);
+		File f = new File(path);
 		
 		// Make sure the file or directory exists and isn't write protected
 		if (!f.exists())
@@ -285,6 +305,15 @@ public class DatabaseSynchronize {
 		return StatusCode.success;
 	}
 	
+	private int moveFile(String src, String dst) {
+		
+		if ( copyFile(src,dst) != 0 ) 
+			return StatusCode.ERR_MOVE_FILE_ERROR();
+		if ( deleteFile(src) != 0 )
+			return StatusCode.ERR_MOVE_FILE_ERROR();
+		
+		return StatusCode.success;
+	}
 	
 	public int wget(URL url, String target) {
 		URLConnection conn = null; 

@@ -113,8 +113,12 @@ public class StatusCode {
 		return log("-3001","Get sqlite path fail");
 	}
 
-	public static int ERR_EXE_USER_SQL_ERROR() {
-		return log("-3002","Sql of user execute error");
+	public static int ERR_EXE_USER_RULES_ERROR() {
+		return log("-3002","Rules of user execute error");
+	}
+	
+	public static int ERR_EXE_USER_RULES_TO_DB_ERROR() {
+		return log("-3002","Rules of user execute error");
 	}
 	
 	public static int ERR_COLS_NUMBER_ERROR() {
@@ -143,6 +147,10 @@ public class StatusCode {
 		return log("-3007","file not found");
 	}
 	public static int ERR_RM_FILE_ERROR() {
+		return log("-3007","file not found");
+	}
+	
+	public static int ERR_MOVE_FILE_ERROR() {
 		return log("-3007","file not found");
 	}
 

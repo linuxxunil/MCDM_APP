@@ -27,7 +27,7 @@ public class GetAllTableOfApp extends HttpServlet{
 		String smeId = req.getParameter("smeId");
 		String appId = req.getParameter("appId");
 		
-		String result =  new DatabaseSynchronize().getAllTableOfApp("Sme79", "XXX");
+		String result =  new DatabaseSynchronize().getAllTableOfApp("Sme79", "aaa");
 		
 		PrintWriter out = resp.getWriter();
 		out.println(result);
