@@ -2,7 +2,7 @@
     <wb-module deploy-name="MCDM_APP">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <property name="java-output-path" value="/MCDM_APP/build/classes"/>
         <property name="context-root" value="MCDM_APP"/>
+        <property name="java-output-path" value="/MCDM_APP/build/classes"/>
     </wb-module>
 </project-modules>
