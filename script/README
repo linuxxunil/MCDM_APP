@@ -1,0 +1,16 @@
+1. push mcdm.war to cloudfoundry
+./mcdm.sh restart
+
+2. prepare shared folder
+mkdir /home/mcdm/{db,tmp,download}
+
+3. install a nfs server
+apt-get install nfs-kernel-server
+vim /etc/export
+echo "/home/mcdm         10.1.1.0/24(rw)   *(rw)   *(rw,sync,no_root_squash)" >> /etc/export
+
+3. every dea host need to bind folder to /home/mcdm
+apt-get install nfs-common
+echo "mount -t nfs 10.1.1.241:/home/mcdm /home/mcdm/" >> /etc/rc.local
+
+
