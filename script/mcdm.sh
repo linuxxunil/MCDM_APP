@@ -2,9 +2,9 @@
 use_cloudfoundry=yes
 ext_url="mcdm.servehttp.com"
 base_dir=/home/mcdm
-db_dir="$base_dir/db_dir"
-tmp_dir="$base_dir/tmp_dir"
-download_dir="$base_dir/download_dir"
+db_dir="$base_dir/db/"
+tmp_dir="$base_dir/tmp/"
+download_dir="$base_dir/download/"
 log_host="127.0.0.1"
 log_port=514
 app_name="mcdm"
@@ -13,7 +13,7 @@ instance=1
 push_app(){
 echo -e "Y\n$app_name\nY\nY\n$memory\n$instance\nN\nN\n" | vmc push --no-start
 vmc env-add $app_name "use_cloudfoundry=$use_cloudfoundry"
-vmc env-add $app_name "db__dir=$db_dir"
+vmc env-add $app_name "db_dir=$db_dir"
 vmc env-add $app_name "tmp_dir=$tmp_dir"
 vmc env-add $app_name "download_dir=$download_dir"
 vmc env-add $app_name "log_host=$log_host"

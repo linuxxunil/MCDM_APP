@@ -23,13 +23,9 @@ import edu.mcdm.common.StatusCode;
 import edu.mcdm.security.Encrypt;
 
 public class DatabaseSynchronize {
-	/*
-	String templatePath = System.getenv("template_path");
-	String tmpPath = System.getenv("tmp_path");
-	*/
 	private String dbDir = System.getenv("db_dir");
 	private String tmpDir =System.getenv("tmp_dir");
-	private String downloadDir = System.getenv("downalod_dir");
+	private String downloadDir = System.getenv("download_dir");
 	
 	public DatabaseSynchronize() {
 		if ( System.getenv("use_cloudfoundry") == null ) {
