@@ -5,9 +5,6 @@ import java.util.regex.Pattern;
 
 public class StringUtility {
 	/**
-	 * 函數名稱 : getDirectory
-	 * 函數說明 : 擷取檔案的路徑位置
-	 * 函數範例 :  
 	 * @param token
 	 * @param path
 	 * @return
@@ -17,10 +14,7 @@ public class StringUtility {
 		return split[split.length-1];
 	}
 	
-	/**
-	 * 函數名稱 : getDirectory
-	 * 函數說明 : 擷取檔案的路徑位置
-	 * 函數範例 :  
+	/** 
 	 *  input  : /sdcard/data/cscheduling/data.db
 	 *  output : /sdcard/data/cscheduling
 	 * 
@@ -38,9 +32,6 @@ public class StringUtility {
 	
 	
 	/**
-	 * 函數名稱 : isMailAddress
-	 * 函數說明 : 判斷是否是MailAdress
-	 * 函數範例 :  
 	 *  input  : jesse_lin@ismp.csie.ncku.edu.tw
 	 *  output : true
 	 * @param mail

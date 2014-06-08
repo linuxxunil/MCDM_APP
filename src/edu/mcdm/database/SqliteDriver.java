@@ -36,6 +36,7 @@ public class SqliteDriver extends DatabaseDriver {
 			if ( !dir.exists() && !dir.mkdirs() )
 				return StatusCode.ERR_OPEN_DIR(StringUtility.getDirectory(dbPath));
 			*/
+			System.out.println(dbPath);
 			conn =  DriverManager
 					.getConnection(
 					"jdbc:sqlite:" + this.dbPath	

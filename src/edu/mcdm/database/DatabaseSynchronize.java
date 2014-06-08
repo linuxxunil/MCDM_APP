@@ -27,7 +27,7 @@ public class DatabaseSynchronize {
 	String templatePath = System.getenv("template_path");
 	String tmpPath = System.getenv("tmp_path");
 	*/
-	private String dbDir = System.getenv("db_schmea_dir");
+	private String dbDir = System.getenv("db_dir");
 	private String tmpDir =System.getenv("tmp_dir");
 	private String downloadDir = System.getenv("downalod_dir");
 	

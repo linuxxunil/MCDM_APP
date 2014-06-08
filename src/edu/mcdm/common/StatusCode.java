@@ -2,23 +2,9 @@ package edu.mcdm.common;
 
 /**
  * StatusCode Definition 
- *  Status Code 是從 00000000~99999999 and -00000001~-99999999
- *  的一組數值，0:表示成功 / 正: Information / 負: Error 
- *  
- *  第 1 digital(MSB) = Log Type ( Developer Log (0) / User Log(1) )
- *  第 2 digital(MSB) = Package Number
- *  第 3~4 digital(MSB) = Class Number
- *  第 5~6 digital(MSB) = Function Number
- *  第 7~8 digital(MSB) = Status Code
- *  
- *  0x0 0 0 00 00 00
- *  1 2  3  4  5
- *  
- *  
  * @author jesse
  *
  */
-
 
 public class StatusCode {
 	public static final int success = 0;
@@ -141,17 +127,17 @@ public class StatusCode {
 	}
 	
 	public static int ERR_RM_FILE_CANNOT_WRITE_ERROR() {
-		return log("-3007","file not found");
+		return log("-3008","file can not write");
 	}
 	public static int ERR_RM_DIR_NOT_EMPTY_ERROR() {
-		return log("-3007","file not found");
+		return log("-3009","Dir of rmmove isn't empty");
 	}
 	public static int ERR_RM_FILE_ERROR() {
-		return log("-3007","file not found");
+		return log("-3010","remove file error");
 	}
 	
 	public static int ERR_MOVE_FILE_ERROR() {
-		return log("-3007","file not found");
+		return log("-3011","move file error");
 	}
 
 }
