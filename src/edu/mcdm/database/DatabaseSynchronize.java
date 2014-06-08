@@ -147,12 +147,12 @@ public class DatabaseSynchronize {
 			  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH\":\"0\"}";
 		
 		return "{\"STATUS:\"0\",\"STATUS_DESCRIPTION\":\"OK\","
-				  + "\"DB_DOWNLOAD_LINK\":\""+downloadDbPath+"\"}";
+				  + "\"DB_DOWNLOAD_LINK\":\""+syncDbId+"\"}";
 	}	
 	
 	private String[][] getTableSyncRules(String jsonRules) {
 		String[][] rules = null;
-		
+		System.out.println(jsonRules);
 		try {
 			JSONArray jsonArray = new JSONArray(
 					new JSONTokener(jsonRules));
@@ -185,7 +185,7 @@ public class DatabaseSynchronize {
 				rules[1][i-1] = tmp;
 			}
 		} catch (JSONException e ) {
-			StatusCode.ERR_JSON_PARSER_ERROR();
+			StatusCode.ERR_JSON_PARSER_ERROR(e.getMessage());
 			return null;
 		}
 		return rules;

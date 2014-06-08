@@ -110,8 +110,8 @@ public class StatusCode {
 	public static int ERR_COLS_NUMBER_ERROR() {
 		return log("-3003","columns number is less than 0");
 	}
-	public static int ERR_JSON_PARSER_ERROR() {
-		return log("-3004","json parser is error");
+	public static int ERR_JSON_PARSER_ERROR(String errMsg) {
+		return log("-3004","json parser is error"+errMsg);
 	}
 	
 	public static int ERR_WGET_FILE_ERROR() {

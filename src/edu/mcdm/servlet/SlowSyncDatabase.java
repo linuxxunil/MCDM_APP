@@ -43,6 +43,7 @@ public class SlowSyncDatabase extends HttpServlet{
 				+ "{\"TblName\":\"CodeFile\",\"TblSql\":\"SELECT t2.* FROM users t1,CodeFile t2 WHERE userid=\'$Var[0]\' AND t1.HospitalNo=t2.HospitalNo\"}" 
 				+ "]";
 		
+		System.out.println(syncRules);
 		String syncDbId = "7a6c0e29-0a24-4f48-878b-799f03f55105";
 		String smeId= "a@a.com";
 
@@ -59,8 +60,8 @@ public class SlowSyncDatabase extends HttpServlet{
 		
 		//String srcDbPath = req.getParameter("sourceDB");
 		String syncRules = req.getParameter("syncRules");
-		String syncDbId = req.getParameter("syncDBId ");
-		String smeId = req.getParameter("smeId ");
+		String syncDbId = req.getParameter("syncDBId");
+		String smeId = req.getParameter("smeId");
 		
 		String result =  new DatabaseSynchronize().
 				slowSynchronize(null, syncRules, syncDbId, smeId);
