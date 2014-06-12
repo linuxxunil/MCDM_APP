@@ -61,11 +61,11 @@ public class DatabaseSynchronize {
 	public String getAllTableOfApp(String smeId, String appId) {
 		if ( smeId == null || smeId.isEmpty() ) {
 			StatusCode.ERR_PARM_SMEID_IS_NULL(); 
-			return "{\"STATUS:\"-103\",\"STATUS_DESCRIPTION\":\"SMEID Error\","
+			return "{\"STATUS\":\"-103\",\"STATUS_DESCRIPTION\":\"SMEID Error\","
 				  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH\":\"0\"}";
 		} else if ( appId == null || appId.isEmpty() ) {
 			StatusCode.ERR_PARM_APPID_IS_NULL(); 
-			return "{\"STATUS:\"-102\",\"STATUS_DESCRIPTION\":\"APPID Error\","
+			return "{\"STATUS\":\"-102\",\"STATUS_DESCRIPTION\":\"APPID Error\","
 			  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH\":\"0\"}";
 		}
 		
@@ -76,7 +76,8 @@ public class DatabaseSynchronize {
 			
 			if ( appDbPath == null ) {
 				StatusCode.ERR_GET_DB_PATH_ERROR();
-				return null;
+				return "{\"STATUS\":\"-202\",\"STATUS_DESCRIPTION\":\"Get Table Error\","
+				  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH\":\"0\"}";
 			}
 			
 			DatabaseDriver db = 
@@ -87,7 +88,7 @@ public class DatabaseSynchronize {
 			String[] tables = db.getTables();
 			
 			jsonFormat = String.format( "{"
-					+ "\"STATUS:\"%s\"," 
+					+ "\"STATUS\":\"%s\"," 
 					+ "\"STATUS_DESCRIPTION\":\"%s\","
 					+ "\"APP_DB_ID\":\"%s\","
 					+ "\"APP_TABLES_LENGTH\":\"%d\""
@@ -103,7 +104,7 @@ public class DatabaseSynchronize {
 			db.close();
 		} catch ( Exception e ) {
 			StatusCode.ERR_UNKOWN_ERROR();
-			return "{\"STATUS:\"-999\",\"STATUS_DESCRIPTION\":\"UNKOWN Error\","
+			return "{\"STATUS\":\"-999\",\"STATUS_DESCRIPTION\":\"UNKOWN Error\","
 					  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH:\"0\"}";
 		}
 		return jsonFormat;
@@ -118,41 +119,40 @@ public class DatabaseSynchronize {
 		
 		if ( srcDbPath != null ) {
 			StatusCode.ERR_PARM_SOURCE_DB_ISNOT_ERROR(); 
-			return "{\"STATUS:\"-105\",\"STATUS_DESCRIPTION\":\"Source DB Error\","
+			return "{\"STATUS\":\"-105\",\"STATUS_DESCRIPTION\":\"Source DB Error\","
 				  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH\":\"0\"}";
 		} else if ((rules=getTableSyncRules(syncRules)) == null ) {
-			return "{\"STATUS:\"-108\",\"STATUS_DESCRIPTION\":\"Sync Rules Error\","
+			return "{\"STATUS\":\"-108\",\"STATUS_DESCRIPTION\":\"Sync Rules Error\","
 					  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH\":\"0\"}";
 		} else if ( syncDbId == null || syncDbId.isEmpty() || !f.exists() || !f.isFile()) {
 			StatusCode.ERR_PARM_SYNC_DB_IS_NULL(); 
-			return "{\"STATUS:\"-106\",\"STATUS_DESCRIPTION\":\"Sync DB ID Error\","
+			return "{\"STATUS\":\"-106\",\"STATUS_DESCRIPTION\":\"Sync DB ID Error\","
 			  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH\":\"0\"}";
 		} else if ( smeId == null || smeId.isEmpty() ) {
 			StatusCode.ERR_PARM_SMEID_IS_NULL(); 
-			return "{\"STATUS:\"-103\",\"STATUS_DESCRIPTION\":\"SMEID Error\","
+			return "{\"STATUS\":\"-103\",\"STATUS_DESCRIPTION\":\"SMEID Error\","
 			  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH\":\"0\"}";
 		}
-
+		
 		for ( int i=0 ; i<rules[0].length; i++ ) {
 			if ( execDataFromServerToSqlite(syncDbPath, rules[0][i], rules[1][i])
 															!= StatusCode.success ) {
 				deleteFile(syncDbPath);
-				return "{\"STATUS:\"-201\",\"STATUS_DESCRIPTION\":\"Synchronized Error\","
+				return "{\"STATUS\":\"-201\",\"STATUS_DESCRIPTION\":\"Synchronized Error\","
 				  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH\":\"0\"}";
 			}
 		}
 
 		if ( moveFile(syncDbPath, downloadDbPath) != 0 )
-			return "{\"STATUS:\"-201\",\"STATUS_DESCRIPTION\":\"Synchronized Error\","
+			return "{\"STATUS\":\"-201\",\"STATUS_DESCRIPTION\":\"Synchronized Error\","
 			  + "\"APP_DB_ID\":\"NULL\",\"APP_TABLES_LENGTH\":\"0\"}";
 		
-		return "{\"STATUS:\"0\",\"STATUS_DESCRIPTION\":\"OK\","
+		return "{\"STATUS\":\"0\",\"STATUS_DESCRIPTION\":\"OK\","
 				  + "\"DB_DOWNLOAD_LINK\":\""+syncDbId+"\"}";
 	}	
 	
 	private String[][] getTableSyncRules(String jsonRules) {
 		String[][] rules = null;
-		System.out.println(jsonRules);
 		try {
 			JSONArray jsonArray = new JSONArray(
 					new JSONTokener(jsonRules));
