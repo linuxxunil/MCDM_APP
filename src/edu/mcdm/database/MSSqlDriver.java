@@ -11,21 +11,26 @@ import edu.mcdm.common.StatusCode;
 
 public class MSSqlDriver extends DatabaseDriver {
 
-	private String UserName = "sa";
-	private String Password = "ptch@RS";
+	private String dbUrl = "sqlserver://175.99.86.134:1433;instance=Cscheduling_SQL;DatabaseName=cscheduling;charset=utf-8";
+	private String dbUser = "sa";
+	private String dbPass = "ptch@RS";
 	private Connection con = null;
 	private Statement stmt = null;
 	private ResultSet rs = null;
 
+	
+	public MSSqlDriver(String dbUrl, String dbUser, String dbPass) {
+		this.dbUrl = dbUrl;
+		this.dbUser = dbUser;
+		this.dbPass = dbPass;
+}
 	@Override
 	public int onConnect() {
 		try {
 			Class.forName("net.sourceforge.jtds.jdbc.Driver");
 			
 			con = DriverManager
-					.getConnection(
-							"jdbc:jtds:sqlserver://175.99.86.134:1433;instance=Cscheduling_SQL;DatabaseName=cscheduling;charset=utf-8",
-							UserName, Password);
+					.getConnection("jdbc:jtds:"+dbUrl, dbUser, dbPass);
 		} catch (ClassNotFoundException e1) {
 			return StatusCode.ERR_JDBC_CLASS_NOT_FOUND();
 		} catch (SQLException e) {
